@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="460" viewBox="0 0 1040 460" fill="none" role="img">
+  <defs>
+    <marker id="arrow-light" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#59636e"/></marker>
+    <marker id="arrow-light-r" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10 0 L0 5 L10 10 z" fill="#59636e"/></marker>
+  </defs>
+  <rect width="1040" height="460" rx="16" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="20" y="20" width="300" height="420" rx="14" fill="#f6f8fa" stroke="#d0d7de" stroke-dasharray="4 4"/>
+  <text x="34" y="40" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" letter-spacing="2" fill="#59636e">WINDOW · WEBKITGTK</text>
+  <rect x="360" y="20" width="320" height="420" rx="14" fill="#f6f8fa" stroke="#d0d7de" stroke-dasharray="4 4"/>
+  <text x="374" y="40" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" letter-spacing="2" fill="#59636e">RUST BACKEND · TAURI V2</text>
+  <rect x="720" y="20" width="300" height="420" rx="14" fill="#f6f8fa" stroke="#d0d7de" stroke-dasharray="4 4"/>
+  <text x="734" y="40" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" letter-spacing="2" fill="#59636e">LOCAL TOOLS · ALL OPTIONAL</text>
+  <line x1="290" y1="92" x2="390" y2="92" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)" marker-start="url(#arrow-light-r)"/><rect x="314.2" y="83" width="51.599999999999994" height="18" rx="9" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="340" y="96" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="10.5" fill="#59636e">invoke</text>
+  <line x1="520" y1="124" x2="520" y2="180" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)"/>
+  <line x1="650" y1="92" x2="750" y2="92" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)"/>
+  <line x1="613.3333333333334" y1="124" x2="776.6666666666666" y2="180" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)"/>
+  <line x1="566.6666666666666" y1="124" x2="823.3333333333334" y2="300" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)"/>
+  <line x1="290" y1="332" x2="390" y2="332" stroke="#59636e" stroke-width="1.4" marker-end="url(#arrow-light)"/><rect x="281.2" y="323" width="117.6" height="18" rx="9" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="340" y="336" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="10.5" fill="#59636e">MCP bridge (bun)</text>
+  <line x1="473.3333333333333" y1="300" x2="216.66666666666666" y2="124" stroke="#59636e" stroke-width="1.4" stroke-dasharray="5 5" marker-end="url(#arrow-light)"/><rect x="319.2" y="203" width="51.599999999999994" height="18" rx="9" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="345" y="216" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="10.5" fill="#59636e">events</text>
+  <rect x="50" y="60" width="240" height="64" rx="10" fill="#ffffff" stroke="#d8a35f" stroke-width="2"/>
+  <text x="170" y="88" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">React UI</text><text x="170" y="107" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">profiles · panels · palette</text>
+  <rect x="50" y="300" width="240" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="170" y="328" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">Terminal (PTY)</text><text x="170" y="347" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">claude shim on PATH</text>
+  <rect x="390" y="60" width="260" height="64" rx="10" fill="#ffffff" stroke="#d8a35f" stroke-width="2"/>
+  <text x="520" y="88" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">Tauri commands</text><text x="520" y="107" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">150+ · fs, archives, index</text>
+  <rect x="390" y="180" width="260" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="520" y="208" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">Native libraries</text><text x="520" y="227" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">libgit2 · GStreamer · image</text>
+  <rect x="390" y="300" width="260" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="520" y="328" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">control.rs</text><text x="520" y="347" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">Unix socket · MCP server</text>
+  <rect x="750" y="60" width="240" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="870" y="88" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">ffmpeg · yt-dlp</text><text x="870" y="107" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">media, downloads</text>
+  <rect x="750" y="180" width="240" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="870" y="208" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">demucs (venv)</text><text x="870" y="227" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">stem separation, GPU</text>
+  <rect x="750" y="300" width="240" height="64" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+  <text x="870" y="328" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">pandoc · tesseract</text><text x="870" y="347" text-anchor="middle" font-family="ui-monospace,'SF Mono',Consolas,monospace" font-size="11" fill="#59636e">conversion, OCR</text>
+</svg>

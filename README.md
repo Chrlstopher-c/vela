@@ -1,173 +1,270 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/banner-dark.svg">
+    <img src="docs/readme/banner-light.svg" alt="Vela, a Linux file manager with an integrated editor" width="100%">
+  </picture>
+</p>
+
+<p align="center"><sub>English · <a href="#version-française">Version française</a></sub></p>
+
 # Vela
 
-File manager Linux organisé en **profils** : chaque profil est une disposition complète que tu composes toi-même. Tu choisis ce qui occupe la gauche, le centre, la droite et le bas parmi un jeu de panneaux — favoris, listing, éditeur, arborescence, terminal — et tu bascules de l'un à l'autre depuis la barre du haut. Deux profils sont fournis d'office : « Explorateur » (la navigation classique) et « Édition » (listing + éditeur côte à côte). Zéro dépendance réseau.
+A file manager for Linux that also opens the file. Nemo never got a preview pane, so Vela puts a real code editor next to the listing, and adds local media tools, native Git, a command palette and a built-in browser. Tauri v2, and nothing it does needs a network.
 
-> 📋 Panorama complet des fonctionnalités, comparatifs et tableaux : **[FEATURES.md](FEATURES.md)**.
+> Status: v2.9, my daily driver. 151 Tauri commands behind the interface. Last active June 2026.
 
-## Pourquoi
+<p align="center">
+  <img src="docs/readme/shots/edition.png" alt="Vela in the Edition profile: file list on the left, code editor on the right" width="100%">
+</p>
+<p align="center"><sub>The Edition profile: listing and CodeMirror side by side, Git status dots on the files, tabs across the top.</sub></p>
 
-Nemo n'a jamais intégré de preview pane. Vela le fait nativement, avec un vrai éditeur, sans fork à maintenir.
+## What makes it different
 
-## Fonctionnalités
+Every window is a **profile**: you decide what sits left, centre, right and bottom among favourites, listing, editor, tree and terminal, then switch profiles from the top bar. Explorer and Edition come built in.
 
-**Profils de layout**
-- Sélecteur de profil dans la barre du haut, un profil actif à la fois
-- Éditeur de profil (bouton sliders) : créer, dupliquer, renommer, supprimer
-- Quatre zones — gauche / centre / droite / bas — chacune reçoit un panneau au choix (centre obligatoire)
-- Panneaux disponibles : favoris, listing fichiers, éditeur, arborescence, terminal
-- Barre de filtres masquable par profil ; barre du haut toujours présente
-- Persisté dans `~/.config/vela/profiles.json`
+The parts a stock file manager does not have:
 
-**Panneau Fichiers**
-- Navigation grille avec icônes par format (logos devicon + SVG génériques)
-- Sidebar : Favoris (pins + groupes collapsibles), Emplacements XDG, Montages
-- Breadcrumb éditable (clic → saisie chemin directe)
-- Recherche live dans le dossier (debounce 500ms, 150 résultats)
-- Tri configurable : nom, date, taille, type — ASC/DESC, dossiers en tête — persisté entre sessions
-- Filtre : Tout / Dossiers / Fichiers
-- CRUD : nouveau fichier, nouveau dossier, renommer, supprimer
-- Drag & drop : fichiers/dossiers vers dossiers, crumbs du chemin, sidebar
-- Clic droit fichier : ouvrir, copier le chemin absolu, copier le chemin relatif, renommer, supprimer, propriétés
-- Clic droit zone vide : nouveau fichier/dossier, actualiser, toggle fichiers cachés, épingler le dossier, propriétés
-- Menus contextuels toujours clampés dans l'écran (ancrés au curseur, rabattus à l'intérieur, jamais coupés)
-- `Ctrl+clic` sur un chemin affiché dans le terminal intégré → ouvre le fichier dans l'éditeur / entre dans le dossier
+- **An editor.** CodeMirror 6 with highlighting for the usual languages, `Ctrl+S`, `Ctrl+F`, Markdown preview, inline images, archives browsed in place (zip, tar.\*, rar, 7z), spreadsheets with a live filter, and files over a megabyte loaded in chunks so nothing freezes.
+- **Media tools with no timeline.** Crop, rotate, resize and adjust images; cut, fade, normalise and convert audio; cut, compress and extract from video. Stem separation with demucs when you want it, on the GPU if there is one. All local, through ffmpeg and the Rust `image` crate.
+- **Git without the `git` binary.** libgit2 gives status dots in the listing, a panel with staging, commit, branches and history, and an inline diff between HEAD and disk.
+- **A command palette** (`Ctrl+K`) that searches files across the whole disk through a background index, actions and places at once.
+- **A browser.** Multi-tab WebKit with sessions kept between launches, and one button to wipe everything.
+- **A downloader** for YouTube and Spotify links through yt-dlp and spotdl, playlists included, with progress per item.
+- **Conversion of almost anything**: images to PDF with nothing installed, documents through pandoc, office files through LibreOffice. Missing tool, missing menu entry, no error.
+- **An agent hook.** Run `claude` in the built-in terminal and Claude Code drives the window through a local MCP server on a Unix socket: open a file, show a diff, navigate, preview generated content. The shim exists only inside Vela's terminal, and your global Claude config is untouched.
 
-**Panneau Édition**
-- Split liste / éditeur
-- CodeMirror 6 (Python, JS/TS, Rust, HTML, CSS, JSON, Markdown, Go, PHP...)
-- `Ctrl+S` sauvegarder · `Ctrl+F` rechercher dans le fichier
-- Aperçu Markdown rendu · Preview image inline (PNG, JPEG, GIF, WebP, SVG...)
-- Viewer archives (ZIP, TAR.GZ, TAR.BZ2, TAR.XZ, RAR, 7Z) + extraction (ici ou chemin custom)
-- Tableaux CSV/TSV/XLSX/XLS/ODS avec filtre live
-- Gros fichiers (> 1 Mo) : chunks 512 Ko, zéro freeze
-- Fichiers sans extension reconnue : éditables (texte brut)
-- Onglets multi-fichiers : clic droit (renommer, supprimer, copier le chemin, couleur) + pastille de tag
+<p align="center">
+  <img src="docs/readme/shots/explorer.png" alt="Vela in the Explorer profile" width="100%">
+</p>
+<p align="center"><sub>The Explorer profile: favourites, XDG places and mounts on the left, sortable listing with per-format icons, free space at the bottom.</sub></p>
 
-**Propriétés (clic droit)**
-- Métadonnées : extension, emplacement, permissions Unix
-- Contenu dossier : éléments directs, fichiers et dossiers en récursif, taille totale
-- App par défaut : MIME détecté par extension (cohérent cross-fichiers), liste complète des apps installées, scan PATH complet, commande personnalisée (`/usr/bin/monapp %f`)
+## How it works
 
-**Outils média (clic droit → « Éditer l'image… / Outils audio… / Outils vidéo… »)**
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/how-it-works-dark.svg">
+    <img src="docs/readme/how-it-works-light.svg" alt="React UI in WebKitGTK, Rust backend, optional local tools" width="100%">
+  </picture>
+</p>
 
-Le fichier s'ouvre dans le viewer avec un HUD d'édition docké (toggle via le bouton sliders de la barre). Modèle « ouvre → paramètre → exporte », sans timeline. Tout est local (ffmpeg, crate `image`, demucs).
+The window is a WebKitGTK webview running React. Everything touching the system is a Rust command on the Tauri side: filesystem, archives, the search index, libgit2, GStreamer for playback, the `image` crate for edits. Heavier jobs run as subprocesses, and each one is optional. The terminal is a real PTY; typing `claude` in it starts a small Bun bridge that speaks MCP to the app over a Unix socket.
 
-- **Image** — édition accumulée avec aperçu live : recadrer, pivoter (90/180/270), retourner, redimensionner, ajuster (luminosité/contraste/saturation). On empile les opérations puis **un seul bouton Sauvegarder** rejoue la séquence en un fichier `_edited` (non destructif, format origine/png/jpg/webp + qualité).
-- **Audio** — découper (sans réencodage), fondu entrée/sortie, normaliser (loudnorm), convertir (mp3/flac/wav/ogg/m4a + bitrate), supprimer la voix (rapide, filtre center-removal sans IA), et **séparation de stems via demucs** (voix/batterie/basse/autres ou voix+accompagnement, GPU si CUDA dispo). demucs est optionnel : installé automatiquement par `install.sh`, ou à la demande depuis le panneau.
-- **Vidéo** — découper (sans réencodage), convertir/compresser (CRF, job background avec progression + annulation), extraire une image (timestamp → png), extraire l'audio (m4a/mp3/wav).
+## Install
 
-**Téléchargeur (Sidebar → Système → « Télécharger… »)**
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/install-dark.svg">
+    <img src="docs/readme/install-light.svg" alt="Install in four steps: system packages, build, optional tools, launch" width="100%">
+  </picture>
+</p>
 
-Coller une URL YouTube ou Spotify → télécharger sans passer par un site de conversion en ligne. 100 % local (yt-dlp + spotdl).
-- Détection automatique titre unique vs playlist. Playlist → liste des morceaux (chargement progressif au-delà de 10, scroll), tout sélectionner / désélectionner / au cas par cas.
-- Choix du format / qualité / langue audio / sous-titres (parmi ceux disponibles), ou extraction audio seule (mp3/flac/wav/m4a/opus).
-- Destination = dossier courant par défaut, modifiable, avec option « créer un nouveau dossier ».
-- Téléchargement par lot, progression et annulation par morceau.
-- Spotify : pas de téléchargement direct (DRM) — spotdl résout le titre et récupère l'équivalent. yt-dlp + spotdl sont installés automatiquement par `install.sh`.
-
-**Navigateur intégré (bouton globe dans la barre du haut)**
-
-Un vrai navigateur web multi-onglets dans la zone centrale, moteur WebKit, navigation libre vers n'importe quel site.
-- Onglets multiples avec barre d'adresse (URL directe ou recherche), précédent / suivant / recharger.
-- Cookies et sessions conservés entre les lancements : tu restes connecté à tes sites d'une fois sur l'autre.
-- Bouton « Réinitialiser le navigateur » dans les Réglages : efface tout (cookies, sessions, cache) d'un coup.
-- La vidéo (YouTube...) passe en rendu logiciel sur ce navigateur pour éviter un crash de compositing — fluide à l'usage.
-
-**Palette de commandes (`Ctrl+K`)**
-
-Une barre, tu tapes ce que tu veux. Elle cherche en même temps dans tes fichiers (dossier courant + tout le système via un index), dans les actions (convertir, terminal, télécharger, réglages, profils…) et dans tes emplacements. Pas de menu à connaître : tu exprimes l'intention, Vela la trouve. Option avancée : interprétation en langage naturel via un LLM 100 % local (EchoHub), désactivée par défaut.
-
-**Conversion universelle (clic droit → « Convertir vers »)**
-
-Images entre elles et vers PDF (sans rien installer), documents via pandoc (md/html/docx/odt/epub…), bureautique vers PDF via LibreOffice. Tout en local. Les outils externes sont optionnels : absents, l'entrée disparaît proprement.
-
-**Actions intelligentes (clic droit sur une sélection)**
-
-Le menu s'adapte à ce que tu sélectionnes. Plusieurs images → « Créer un PDF ». Des CSV → « Fusionner ». Un dossier en vrac → « Ranger par type / par date » (annulable avec `Ctrl+Z`).
-
-**Git intégré**
-
-Dans un dépôt, les fichiers et dossiers portent une pastille d'état (modifié / nouveau / supprimé), togglable depuis la barre de filtres. Un panneau Git assignable à une zone : statut, ahead/behind vs upstream, index et modifications séparés, stage/unstage par fichier, commit, bascule de branche, historique. **Diff inline** HEAD ↔ disque (bouton `⇄` par fichier). Natif (libgit2), sans appeler `git`.
-
-**Agent IA intégré (control plane)**
-
-Lance `claude` dans le terminal intégré : Claude Code pilote l'interface de Vela via un serveur MCP souverain (socket Unix, zéro réseau). Il peut afficher un fichier (`open_file`), un contenu généré (`preview_content`), piloter le navigateur (`open_url` / `hide_browser`), faire naviguer l'explorateur (`navigate` / `reveal_file`), présenter un diff git (`show_diff` / `compare_files`) ou notifier une étape (`notify`). Isolation stricte : ce MCP n'existe que dans le terminal de Vela, jamais dans une session Claude normale, et aucune config globale n'est modifiée.
-
-**Recherche globale**
-
-Un index des noms de fichiers construit en tâche de fond au démarrage, interrogé instantanément depuis la palette — pour retrouver un fichier où qu'il soit.
-
-**OCR (clic droit sur une image ou un PDF → « Extraire le texte »)**
-
-Reconnaissance de texte locale via tesseract (optionnel). Le résultat est écrit à côté du fichier source.
-
-## Stack
-
-- **Tauri v2** (Rust) + **React 19** + **TypeScript** + **Tailwind v4**
-- **CodeMirror 6** · **react-markdown** · **SheetJS** · **devicon**
-- Archives : `zip`, `tar`, `flate2`, `bzip2`, `xz2` + `7z` système
-- MIME : `mime_guess` (extension) + `xdg-mime` (fallback)
-- Lecteur vidéo/audio : **GStreamer** (décodage GPU, contourne `<video>` WebKitGTK)
-- Outils média : **ffmpeg/ffprobe** (audio/vidéo), crate **`image`** (image), **demucs** + torch/torchcodec (séparation de stems, venv dédié)
-
-## Limitation connue — WebKit vs GTK natif
-
-Le backend est en Rust, rapide. L'interface est rendue par WebKitGTK : un moteur de navigateur embarqué, pas des widgets GTK natifs. Nemo et Thunar, écrits en C, s'appuient directement sur GTK — moins de RAM, démarrage plus rapide, pas de couche intermédiaire.
-
-En pratique ça se sent au lancement et sur les dossiers à plusieurs milliers d'entrées. C'est le prix de CodeMirror, des previews inline et du dark theme cohérent — des choses difficiles à faire proprement en GTK pur. Le trade-off est assumé.
-
-## Installation
-
-### Prérequis (Arch Linux)
-
-```bash
-# webkit2gtk-4.1, gtk3, rust, bun — déjà présents sur une workstation Hyprland standard
-pacman -S webkit2gtk-4.1 gtk3 base-devel
-# Média : GStreamer (lecteur), ffmpeg (outils audio/vidéo), python (demucs optionnel)
-pacman -S gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav ffmpeg python
+```sh
+sudo pacman -S webkit2gtk-4.1 gtk3 base-devel gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav ffmpeg python
 curl -fsSL https://bun.sh/install | bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+git clone https://github.com/Chrlstopher-c/vela && cd vela
+bun install && ./install.sh
 ```
 
-`install.sh` installe aussi demucs (séparation de stems) dans un venv dédié `~/.local/share/vela/demucs-venv` — torch ~3 Go au premier run. Opt-out : `VELA_SKIP_STEMS=1 ./install.sh`. Vela fonctionne sans (la séparation s'affiche « non installée », installable depuis le panneau).
+Development: `./start.sh` runs `tauri dev` on port 1430, with logs in `logs/dev.log`.
 
-### Build
+## Use
 
-```bash
-git clone https://github.com/trinityUwU/vela
-cd vela
-bun install
-bun run tauri build
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/usage-dark.svg">
+    <img src="docs/readme/usage-light.svg" alt="Pick a profile, open the file, act on a selection, or use the palette" width="100%">
+  </picture>
+</p>
+
+## Where things live
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/files-dark.svg">
+    <img src="docs/readme/files-light.svg" alt="Installed files, configuration, optional venvs, runtime socket and logs" width="100%">
+  </picture>
+</p>
+
+## Uninstall
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/uninstall-dark.svg">
+    <img src="docs/readme/uninstall-light.svg" alt="Remove the app, the heavy optional parts, then your settings" width="100%">
+  </picture>
+</p>
+
+## Counted
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/counted-dark.svg">
+    <img src="docs/readme/counted-light.svg" alt="151 Tauri commands, 42 Rust modules, 3 unit test files" width="100%">
+  </picture>
+</p>
+
+## What it stands on
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/deps-dark.svg">
+    <img src="docs/readme/deps-light.svg" alt="Tauri v2 with React, libgit2, GStreamer" width="100%">
+  </picture>
+</p>
+
+## Help
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Blank window or a crash at launch (Nvidia, Wayland) | WebKitGTK's DMABUF renderer | `WEBKIT_DISABLE_DMABUF_RENDERER=1`, already in the wrapper and the desktop entry |
+| The first stem separation takes forever | demucs is downloading torch, about 3 GB | wait once, or skip stems with `VELA_SKIP_STEMS=1 ./install.sh` |
+| Video in the built-in browser looks software-rendered | it is, deliberately: GPU compositing in those webviews crashed | the native player still decodes on the GPU through GStreamer |
+| Folders with thousands of entries feel slow | WebKitGTK renders the listing where GTK widgets would be faster | known trade-off, see below |
+| `pkill -f vela-bin` kills your own script | `-f` matches the script's own command line | use `pkill -x vela-bin`; that one cost an hour on 2 June |
+| Two windows open, only one talks to Claude | the MCP socket has a fixed path | one instance per session for now |
+
+## Where it stands
+
+Vela does what a file manager does, plus the list above, and I use it every day. The honest limits: it is a webview, so it uses more memory and starts slower than Nemo or Thunar, and large directories show it. That is the price of CodeMirror, inline previews and a coherent dark theme, and I took it knowingly. Playwright cannot drive Tauri's `invoke`, so end-to-end testing is manual and the unit tests only cover fuzzy search, paths and smart actions. Spotify links resolve to a YouTube equivalent because of DRM. The UI is in French.
+
+## Project docs
+
+`FEATURES.md` (the full feature list with comparisons), `ARCHITECTURE.md`, `STATE.md`, `TODO.md`, `ARBORESCENCE.md`.
+
+## Licence
+
+No licence file yet.
+
+---
+
+## Version française
+
+Un gestionnaire de fichiers Linux qui ouvre aussi le fichier. Nemo n'a jamais eu de panneau d'aperçu, alors Vela met un vrai éditeur de code à côté du listing, et ajoute des outils média locaux, Git natif, une palette de commandes et un navigateur intégré. Tauri v2, et rien de ce qu'il fait n'a besoin du réseau.
+
+> État : v2.9, mon outil quotidien. 151 commandes Tauri derrière l'interface. Dernière activité : juin 2026.
+
+<p align="center">
+  <img src="docs/readme/shots/edition.png" alt="Vela dans le profil Édition : liste de fichiers à gauche, éditeur à droite" width="100%">
+</p>
+<p align="center"><sub>Le profil Édition : listing et CodeMirror côte à côte, pastilles d'état Git sur les fichiers, onglets en haut.</sub></p>
+
+### Ce qui le distingue
+
+Chaque fenêtre est un **profil** : tu décides ce qui occupe la gauche, le centre, la droite et le bas parmi favoris, listing, éditeur, arborescence et terminal, puis tu bascules depuis la barre du haut. Explorateur et Édition sont fournis.
+
+Ce qu'un gestionnaire de fichiers classique n'a pas :
+
+- **Un éditeur.** CodeMirror 6 avec coloration pour les langages usuels, `Ctrl+S`, `Ctrl+F`, aperçu Markdown, images en ligne, archives explorées sur place (zip, tar.\*, rar, 7z), tableurs avec filtre live, et fichiers de plus d'un mégaoctet chargés par morceaux pour que rien ne fige.
+- **Des outils média sans timeline.** Recadrer, pivoter, redimensionner et ajuster une image ; découper, fondre, normaliser et convertir de l'audio ; découper, compresser et extraire d'une vidéo. Séparation de stems avec demucs quand tu veux, sur le GPU s'il y en a un. Tout en local, via ffmpeg et la crate Rust `image`.
+- **Git sans le binaire `git`.** libgit2 donne les pastilles d'état dans le listing, un panneau avec index, commit, branches et historique, et un diff inline entre HEAD et le disque.
+- **Une palette de commandes** (`Ctrl+K`) qui cherche en même temps dans les fichiers de tout le disque via un index de fond, dans les actions et dans les emplacements.
+- **Un navigateur.** WebKit multi-onglets avec sessions conservées entre les lancements, et un bouton pour tout effacer.
+- **Un téléchargeur** pour les liens YouTube et Spotify via yt-dlp et spotdl, playlists comprises, avec progression par morceau.
+- **La conversion de presque tout** : images vers PDF sans rien installer, documents via pandoc, bureautique via LibreOffice. Outil absent, entrée de menu absente, pas d'erreur.
+- **Une prise pour l'agent.** Lance `claude` dans le terminal intégré et Claude Code pilote la fenêtre par un serveur MCP local sur socket Unix : ouvrir un fichier, montrer un diff, naviguer, prévisualiser un contenu généré. Le shim n'existe que dans le terminal de Vela, et ta config Claude globale n'est pas touchée.
+
+<p align="center">
+  <img src="docs/readme/shots/explorer.png" alt="Vela dans le profil Explorateur" width="100%">
+</p>
+<p align="center"><sub>Le profil Explorateur : favoris, emplacements XDG et montages à gauche, listing triable avec icônes par format, espace libre en bas.</sub></p>
+
+### Comment ça marche
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/how-it-works-dark.svg">
+    <img src="docs/readme/how-it-works-light.svg" alt="Interface React dans WebKitGTK, backend Rust, outils locaux optionnels" width="100%">
+  </picture>
+</p>
+
+La fenêtre est une webview WebKitGTK qui exécute React. Tout ce qui touche au système est une commande Rust côté Tauri : système de fichiers, archives, index de recherche, libgit2, GStreamer pour la lecture, la crate `image` pour les retouches. Les travaux lourds tournent en sous-processus, et chacun est optionnel. Le terminal est un vrai PTY ; y taper `claude` démarre un petit pont Bun qui parle MCP à l'app par un socket Unix.
+
+### Installation
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/install-dark.svg">
+    <img src="docs/readme/install-light.svg" alt="Installation en quatre étapes : paquets système, compilation, outils optionnels, lancement" width="100%">
+  </picture>
+</p>
+
+```sh
+sudo pacman -S webkit2gtk-4.1 gtk3 base-devel gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav ffmpeg python
+curl -fsSL https://bun.sh/install | bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+git clone https://github.com/Chrlstopher-c/vela && cd vela
+bun install && ./install.sh
 ```
 
-### Installer le binaire
+Développement : `./start.sh` lance `tauri dev` sur le port 1430, journaux dans `logs/dev.log`.
 
-```bash
-# Wrapper avec fix WebKit/Wayland (Nvidia)
-cat > ~/.local/bin/vela << 'EOF'
-#!/usr/bin/env bash
-exec env WEBKIT_DISABLE_DMABUF_RENDERER=1 /path/to/vela/src-tauri/target/release/vela "$@"
-EOF
-chmod +x ~/.local/bin/vela
-```
+### Utilisation
 
-### Raccourci Hyprland
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/usage-dark.svg">
+    <img src="docs/readme/usage-light.svg" alt="Choisir un profil, ouvrir le fichier, agir sur une sélection, ou passer par la palette" width="100%">
+  </picture>
+</p>
 
-```
-bind = SUPER, E, exec, /home/$USER/.local/bin/vela
-```
+### Où sont les choses
 
-## Dev
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/files-dark.svg">
+    <img src="docs/readme/files-light.svg" alt="Fichiers installés, configuration, venvs optionnels, socket d'exécution et journaux" width="100%">
+  </picture>
+</p>
 
-```bash
-bun install
-./start.sh       # lance tauri dev, logs dans logs/dev.log
-./stop.sh
-./restart.sh
-```
+### Désinstallation
 
-Port dev : **1430** (pour éviter les conflits avec d'autres apps Vite sur 1420).
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/uninstall-dark.svg">
+    <img src="docs/readme/uninstall-light.svg" alt="Retirer l'app, les parties optionnelles lourdes, puis tes réglages" width="100%">
+  </picture>
+</p>
 
-## Note WebKit + Wayland (Nvidia)
+### Compté
 
-Le renderer DMABUF de WebKitGTK crashe sur certaines configs Nvidia + Wayland. Le wrapper `~/.local/bin/vela` intègre `WEBKIT_DISABLE_DMABUF_RENDERER=1` pour y remédier.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/counted-dark.svg">
+    <img src="docs/readme/counted-light.svg" alt="151 commandes Tauri, 42 modules Rust, 3 fichiers de tests unitaires" width="100%">
+  </picture>
+</p>
+
+### Sur quoi ça repose
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/readme/deps-dark.svg">
+    <img src="docs/readme/deps-light.svg" alt="Tauri v2 avec React, libgit2, GStreamer" width="100%">
+  </picture>
+</p>
+
+### Aide
+
+| Symptôme | Cause | Remède |
+|---|---|---|
+| Fenêtre blanche ou plantage au lancement (Nvidia, Wayland) | le renderer DMABUF de WebKitGTK | `WEBKIT_DISABLE_DMABUF_RENDERER=1`, déjà dans le wrapper et dans l'entrée de bureau |
+| La première séparation de stems n'en finit pas | demucs télécharge torch, environ 3 Go | attends une fois, ou saute les stems avec `VELA_SKIP_STEMS=1 ./install.sh` |
+| La vidéo du navigateur intégré semble rendue en logiciel | c'est le cas, volontairement : le compositing GPU de ces webviews plantait | le lecteur natif décode toujours sur le GPU via GStreamer |
+| Les dossiers à plusieurs milliers d'entrées traînent | WebKitGTK rend le listing là où des widgets GTK seraient plus rapides | compromis assumé, voir plus bas |
+| `pkill -f vela-bin` tue ton propre script | `-f` matche aussi la ligne de commande du script | utilise `pkill -x vela-bin` ; celui-là a coûté une heure le 2 juin |
+| Deux fenêtres ouvertes, une seule parle à Claude | le socket MCP a un chemin fixe | une instance par session pour l'instant |
+
+### Où ça en est
+
+Vela fait ce que fait un gestionnaire de fichiers, plus la liste ci-dessus, et je m'en sers tous les jours. Les limites honnêtes : c'est une webview, donc plus de mémoire et un démarrage plus lent que Nemo ou Thunar, et les gros dossiers le montrent. C'est le prix de CodeMirror, des aperçus en ligne et d'un thème sombre cohérent, et je l'ai payé en connaissance de cause. Playwright ne sait pas piloter l'`invoke` de Tauri, donc les tests de bout en bout sont manuels et les tests unitaires ne couvrent que la recherche floue, les chemins et les actions intelligentes. Les liens Spotify se résolvent vers un équivalent YouTube à cause du DRM.
+
+### Documentation du projet
+
+`FEATURES.md` (la liste complète avec comparatifs), `ARCHITECTURE.md`, `STATE.md`, `TODO.md`, `ARBORESCENCE.md`.
+
+### Licence
+
+Pas encore de fichier de licence.
