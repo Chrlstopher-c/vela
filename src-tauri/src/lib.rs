@@ -15,8 +15,10 @@ mod codeindex;
 mod download_job;
 mod downloader;
 mod favorites;
+mod filemanager1;
 mod fs_ops;
 mod gallery;
+mod picker;
 mod git;
 mod integrity;
 mod index;
@@ -39,10 +41,31 @@ mod thumbs;
 mod video;
 mod watcher;
 
+// Chemin de dossier passé au démarrage (association MIME inode/directory via .desktop %U),
+// récupéré une seule fois par le front au montage pour y naviguer.
+struct PendingPath(std::sync::Mutex<Option<String>>);
+
+#[tauri::command]
+fn take_pending_path(state: tauri::State<PendingPath>) -> Option<String> {
+    state.0.lock().ok().and_then(|mut g| g.take())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Dossier reçu en argument (clic sur un dossier, « ouvrir avec Vela »). Si une instance tourne
+    // déjà, on l'y fait naviguer via le control plane puis on quitte — pas de seconde instance.
+    let pick = picker::from_args();
+    let picking = pick.is_some();
+    let initial_dir = std::env::args().nth(1).filter(|a| std::path::Path::new(a).is_dir());
+    if let (false, Some(dir)) = (picking, &initial_dir) {
+        if control::forward("navigate", dir) {
+            return;
+        }
+    }
     player::init();
     tauri::Builder::default()
+        .manage(PendingPath(std::sync::Mutex::new(initial_dir)))
+        .manage(picker::PickerState(std::sync::Mutex::new(pick)))
         .manage(archive::ExtractionManager::new())
         .manage(watcher::DirWatcher::new())
         .manage(ops::TransferManager::new())
@@ -53,18 +76,28 @@ pub fn run() {
         .manage(download_job::DownloadManager::new())
         .manage(index::SearchIndex::new())
         .manage(share::ShareManager::new())
-        .setup(|app| {
+        .setup(move |app| {
             use tauri::Manager;
+            // sélecteur de fichiers : fenêtre éphémère, sans index ni canal de contrôle (ceux de l'instance principale)
+            if picking {
+                if let Some(w) = app.get_webview_window("main") {
+                    let _ = w.set_title("Vela · sélection");
+                }
+                return Ok(());
+            }
             let idx = app.state::<index::SearchIndex>().inner().clone();
             std::thread::spawn(move || idx.rebuild_from_home());
             match control::init(&app.handle().clone()) {
                 Ok(plane) => { app.manage(plane); }
                 Err(e) => eprintln!("[control] init impossible : {e}"),
             }
+            filemanager1::init(&app.handle().clone());
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
+            picker::picker_config,
+            picker::picker_finish,
             fs_ops::list_dir,
             fs_ops::read_file,
             fs_ops::read_file_chunk,
@@ -79,6 +112,7 @@ pub fn run() {
             fs_ops::open_native,
             fs_ops::move_entry,
             fs_ops::get_entry_props,
+            take_pending_path,
             ops::trash_entries,
             ops::delete_entries,
             ops::copy_entries,

@@ -59,4 +59,6 @@ color-thief = "0.2"
 wry = "0.55"
 gtk = "0.18"
 webkit2gtk = "2.0"
+zbus = "5"
+percent-encoding = "2"
 

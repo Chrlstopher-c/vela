@@ -1,6 +1,7 @@
 // Assemblage du gestionnaire : topbar, sidebar, zone centrale (grille ou éditeur), modals.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import { useFileManager } from "./hooks/useFileManager";
 import { useProfiles } from "./hooks/useProfiles";
 import { useBrowser } from "./hooks/useBrowser";
@@ -60,6 +61,8 @@ import { useFileActions } from "./hooks/useFileActions";
 import { archiveStem, baseName, parentDir } from "./services/path-util";
 import { gitDiff } from "./services/git";
 import type { DirEntry } from "./types";
+import { usePicker } from "./hooks/usePicker";
+import { PickerBar } from "./components/PickerBar";
 
 type Menu = { x: number; y: number; entry: DirEntry } | null;
 type BgMenu = { x: number; y: number } | null;
@@ -70,9 +73,20 @@ function defaultCriteria(root: string): SearchCriteria {
 
 export default function App() {
   const fm = useFileManager();
+  const picker = usePicker();
+  // Mode sélecteur : départ dans le dossier proposé par l'appli, double-clic sur un fichier = le choisir.
+  useEffect(() => {
+    const c = picker.config;
+    if (c?.path) fm.navigate(c.mode === "save" ? parentDir(c.path) : c.path);
+  }, [picker.config]);
+  const openListed = (entry: DirEntry) => {
+    if (picker.config && !entry.is_dir && picker.config.mode !== "directory") return picker.finish([entry.path]);
+    openInEditor(entry);
+  };
   const profiles = useProfiles();
   const browser = useBrowser();
-  const activeProfile = profiles.active;
+  // en sélecteur : toujours la vue Explorateur, sans toucher au profil enregistré de l'instance principale
+  const activeProfile = (picker.config && profiles.profiles.find((p) => p.id === "explorateur")) || profiles.active;
   const editorActive = Object.values(activeProfile.zones).includes("editor");
   const terminalInZone = Object.values(activeProfile.zones).includes("terminal");
   const { setEditorActive } = fm;
@@ -353,6 +367,10 @@ export default function App() {
     else if (action === "reveal_file") {
       revealOrOpen(String(args.path ?? ""));
     }
+    else if (action === "reveal_in_folder") {
+      const p = String(args.path ?? "");
+      fm.navigate(parentDir(p)).then(() => fm.selectOne(p));
+    }
     else if (action === "compare_files") {
       setDiff({ a: fileEntry(String(args.a ?? "")), b: fileEntry(String(args.b ?? "")) });
     }
@@ -370,6 +388,10 @@ export default function App() {
       (e) => controlRef.current(e.payload.action, e.payload.args),
     );
     return () => { un.then((f) => f()); };
+  }, []);
+  // Dossier passé en argument au démarrage (association MIME inode/directory via .desktop %U).
+  useEffect(() => {
+    invoke<string | null>("take_pending_path").then((p) => { if (p) fm.navigate(p); }).catch(() => {});
   }, []);
   useEffect(() => {
     if (!notice) return;
@@ -680,7 +702,7 @@ export default function App() {
           onToggleBy: toggleBy,
           onSelect,
           onSelectEdit,
-          onOpen: openInEditor,
+          onOpen: openListed,
           onContext,
           onContextBg,
           onClearBg: fm.clearSelection,
@@ -733,6 +755,8 @@ export default function App() {
           onSync: paneSync,
         } : undefined}
       />
+
+      <PickerBar picker={picker} cwd={fm.cwd} selected={selectedEntries} />
 
       {showStatusBar && (
         <StatusBar

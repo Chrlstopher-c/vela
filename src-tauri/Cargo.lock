@@ -5796,6 +5796,7 @@ dependencies = [
  "md-5",
  "mime_guess",
  "notify",
+ "percent-encoding",
  "portable-pty",
  "printpdf",
  "qrcode",
@@ -5815,6 +5816,7 @@ dependencies = [
  "webkit2gtk",
  "wry",
  "xz2",
+ "zbus",
  "zip",
 ]
 

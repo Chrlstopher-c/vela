@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::{Path, PathBuf};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 
 // Bridge MCP embarqué : écrit dans le shim dir au démarrage → app installée autonome.
 const MCP_BRIDGE_SRC: &str = include_str!("../assets/mcp-bridge.ts");
@@ -153,6 +153,7 @@ fn handle(app: &AppHandle, req: &Request) -> serde_json::Value {
             if !Path::new(path).is_dir() {
                 return json!({ "ok": false, "error": format!("dossier introuvable : {path}") });
             }
+            focus_main(app);
             emit(app, "navigate", json!({ "path": path }))
         }
         "reveal_file" => {
@@ -160,6 +161,7 @@ fn handle(app: &AppHandle, req: &Request) -> serde_json::Value {
             if !Path::new(path).is_file() {
                 return json!({ "ok": false, "error": format!("fichier introuvable : {path}") });
             }
+            focus_main(app);
             emit(app, "reveal_file", json!({ "path": path }))
         }
         "show_diff" => {
@@ -210,6 +212,31 @@ fn require_editor_zone() -> Option<serde_json::Value> {
              Demande à l'utilisateur de basculer sur un profil qui contient un éditeur (ex. « Édition »), puis réessaie."
         )
     }))
+}
+
+// Ramène la fenêtre principale au premier plan (un « afficher dans le dossier » vient souvent
+// d'une autre app qui a le focus). No-op si la fenêtre n'existe pas encore.
+fn focus_main(app: &AppHandle) {
+    if let Some(win) = app.get_webview_window("main") {
+        let _ = win.unminimize();
+        let _ = win.set_focus();
+    }
+}
+
+// Transmet une commande à une instance Vela déjà lancée via le socket control plane.
+// Retourne true si une instance vivante a accepté la commande (sinon : aucune instance / socket mort).
+pub fn forward(action: &str, path: &str) -> bool {
+    let sock = runtime_base().join("vela-control.sock");
+    let mut stream = match UnixStream::connect(&sock) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+    let req = json!({ "action": action, "args": { "path": path } }).to_string();
+    if writeln!(stream, "{req}").is_err() {
+        return false;
+    }
+    let mut line = String::new();
+    BufReader::new(&stream).read_line(&mut line).map(|n| n > 0).unwrap_or(false)
 }
 
 fn emit(app: &AppHandle, action: &str, args: serde_json::Value) -> serde_json::Value {
