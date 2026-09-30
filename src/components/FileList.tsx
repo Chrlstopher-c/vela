@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { DirEntry } from "../types";
 import { FileIcon } from "./FileIcon";
 import { gitColor, GIT_LABEL } from "../services/git-ui";
+import { setFileDragData } from "../services/file-drag";
 
 interface Props {
   entries: DirEntry[];
@@ -56,8 +57,7 @@ function FileRow({ entry, selected, active, onSelect, onOpen, onContext, onMove,
   const [dragOver, setDragOver] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData("application/vela", entry.path);
-    e.dataTransfer.effectAllowed = "move";
+    setFileDragData(e.dataTransfer, entry.path);
   };
 
   const handleDragOver = (e: React.DragEvent) => {

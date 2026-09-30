@@ -6,6 +6,7 @@ import { previewKind } from "../services/file-kind";
 import { useThumbnail } from "../hooks/useThumbnail";
 import { useHoverPreview } from "../hooks/useHoverPreview";
 import { gitColor, GIT_LABEL } from "../services/git-ui";
+import { setFileDragData } from "../services/file-drag";
 
 interface Props {
   entry: DirEntry;
@@ -32,8 +33,7 @@ export function FileTile({ entry, selected, active, color, git, onClick, onDoubl
   }, [active]);
 
   const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData("application/vela", entry.path);
-    e.dataTransfer.effectAllowed = "move";
+    setFileDragData(e.dataTransfer, entry.path);
   };
 
   const handleDragOver = (e: React.DragEvent) => {

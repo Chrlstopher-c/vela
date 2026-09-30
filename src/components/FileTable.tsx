@@ -5,6 +5,7 @@ import type { SortBy, SortState } from "../hooks/useSort";
 import { FileIcon } from "./FileIcon";
 import { fmtSize, fmtDate } from "../services/format";
 import { gitColor, GIT_LABEL } from "../services/git-ui";
+import { setFileDragData } from "../services/file-drag";
 
 interface Props {
   entries: DirEntry[];
@@ -103,7 +104,7 @@ function Row({ entry, selected, active, dirSize, color, git, onSelect, onOpen, o
       ref={btnRef}
       tabIndex={-1}
       draggable
-      onDragStart={(e) => { e.dataTransfer.setData("application/vela", entry.path); e.dataTransfer.effectAllowed = "move"; }}
+      onDragStart={(e) => setFileDragData(e.dataTransfer, entry.path)}
       onDragOver={(e) => { if (entry.is_dir) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOver(true); } }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
