@@ -8,4 +8,6 @@ elif [ "$directory" = 1 ]; then mode=directory
 elif [ "$multiple" = 1 ]; then mode=multiple
 fi
 [ -n "$path" ] || path="$HOME"
-exec env WEBKIT_DISABLE_DMABUF_RENDERER=1 /usr/local/bin/vela-bin --pick "$mode" "$path" "$out"
+bin="$HOME/.local/bin/vela-bin"
+[ -x "$bin" ] || bin=/usr/local/bin/vela-bin
+exec env WEBKIT_DISABLE_DMABUF_RENDERER=1 "$bin" --pick "$mode" "$path" "$out"
