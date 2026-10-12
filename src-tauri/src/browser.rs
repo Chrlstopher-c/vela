@@ -21,7 +21,11 @@ mod linux {
 
     // Désactive l'accélération matérielle WebKit sur ce webview uniquement : le compositing
     // GPU/DMABUF crashe sur la lecture vidéo (Wayland). L'UI principale reste accélérée.
+    // Sous rendu DMA-BUF (Echo OS en GPU), une vue sans accélération reste blanche : on ne touche alors à rien.
     fn disable_gpu(wv: &wry::WebView) {
+        if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+            return;
+        }
         if let Some(settings) = WebViewExt::settings(&wv.webview()) {
             settings.set_hardware_acceleration_policy(HardwareAccelerationPolicy::Never);
         }
