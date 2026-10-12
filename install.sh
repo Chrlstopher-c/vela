@@ -33,6 +33,51 @@ else
   exit 1
 fi
 
+# ── Intégration bureau : Vela comme file manager par défaut ──────────────────────────────────
+# 1) .desktop utilisateur (clic sur un dossier → Vela), 2) service D-Bus org.freedesktop.FileManager1
+# (« afficher dans le dossier » des navigateurs → Vela au lieu de Nemo/Dolphin), 3) association MIME.
+echo ""
+echo "→ intégration bureau (file manager par défaut)…"
+APPS_DIR="$HOME/.local/share/applications"
+DBUS_DIR="$HOME/.local/share/dbus-1/services"
+ICON_DIR="$HOME/.local/share/icons/hicolor/128x128/apps"
+mkdir -p "$APPS_DIR" "$DBUS_DIR" "$ICON_DIR"
+
+cp -f "src-tauri/icons/128x128.png" "$ICON_DIR/vela.png" 2>/dev/null || true
+
+cat > "$APPS_DIR/vela.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Vela
+Comment=Gestionnaire de fichiers souverain
+Exec=$HOME/.local/bin/vela %U
+Icon=vela
+Terminal=false
+Categories=System;Utility;FileManager;FileTools;
+MimeType=inode/directory;
+StartupWMClass=vela
+StartupNotify=true
+EOF
+
+# Le nom de fichier est libre ; c'est le champ Name= qui revendique le bus well-known.
+# La priorité ~/.local/share over /usr/share fait gagner Vela face à Nemo/Dolphin pour l'activation.
+cat > "$DBUS_DIR/com.echo.vela.FileManager1.service" <<EOF
+[D-BUS Service]
+Name=org.freedesktop.FileManager1
+Exec=$HOME/.local/bin/vela
+EOF
+
+if command -v xdg-mime >/dev/null 2>&1; then
+  xdg-mime default vela.desktop inode/directory 2>/dev/null \
+    && echo "✓ Vela = file manager par défaut (inode/directory)" \
+    || echo "⚠ xdg-mime : association inode/directory non posée"
+fi
+command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$APPS_DIR" 2>/dev/null || true
+command -v gtk-update-icon-cache >/dev/null 2>&1 \
+  && gtk-update-icon-cache -q -t "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
+echo "✓ service D-Bus FileManager1 installé (« afficher dans le dossier » → Vela)"
+echo "  ⓘ relance Vela ensuite : il prendra possession de org.freedesktop.FileManager1"
+
 # ── Séparation de stems (demucs) — automatique, idempotent, non bloquant ────
 # Installe demucs + torchcodec dans un venv Vela dédié (séparation voix/instru,
 # 100% local, tourne sur GPU si CUDA dispo). torch ~3 Go au premier run.

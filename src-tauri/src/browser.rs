@@ -164,6 +164,9 @@ mod linux {
             for (k, wv) in v.borrow().iter() {
                 if *k == id {
                     let _ = wv.set_bounds(rect(0.0, 0.0, w, h));
+                    // wry ne fait qu'un size_allocate temporaire : GTK le défait au prochain agencement
+                    // (la vue reprenait sa taille de création). La demande de taille, elle, persiste.
+                    widget(wv).set_size_request(w.max(1.0) as i32, h.max(1.0) as i32);
                     widget(wv).set_visible(true);
                 } else {
                     widget(wv).set_visible(false);
